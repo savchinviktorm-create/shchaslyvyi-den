@@ -229,19 +229,31 @@
     function extractText(item) {
       if (!item) return '';
       if (typeof item === 'string') return item;
-      return item.text || item.prediction || item.phrase || JSON.stringify(item);
+      return item.text || item.prediction || item.phrase || item.horoscope || JSON.stringify(item);
     }
 
-    // Завантаження файлів
+    // Завантаження файлу передбачень
     fetch('./data/wishes.json')
-      .then(r => r.json())
-      .then(data => { wishesData = data; checkSavedWish(); })
-      .catch(e => console.log('Не вдалося завантажити wishes.json', e));
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP status ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        wishesData = Array.isArray(data) ? data : (data.wishes || data.data || []);
+        checkSavedWish();
+      })
+      .catch(e => console.log('Помилка завантаження wishes.json:', e));
 
+    // Завантаження файлу гороскопів
     fetch('./data/horoscopes.json')
-      .then(r => r.json())
-      .then(data => { horoscopesData = data; })
-      .catch(e => console.log('Не вдалося завантажити horoscopes.json', e));
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP status ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        horoscopesData = Array.isArray(data) ? data : (data.horoscopes || data.data || []);
+      })
+      .catch(e => console.log('Помилка завантаження horoscopes.json:', e));
 
     // Перевірка, чи вже було отримано передбачення сьогодні
     function checkSavedWish() {
@@ -262,13 +274,13 @@
         return;
       }
 
-      if (wishesData.length === 0) {
-        document.getElementById('wish-display').innerHTML = `<i>Завантаження передбачень... Зачекайте пару секунд.</i>`;
-        return;
+      let text = "";
+      if (wishesData.length > 0) {
+        const randomItem = wishesData[Math.floor(Math.random() * wishesData.length)];
+        text = extractText(randomItem);
+      } else {
+        text = "Всесвіт готує для тебе щось неймовірно солодке та незабутнє. Важливий дзвінок або зустріч уже на підході!";
       }
-
-      const randomItem = wishesData[Math.floor(Math.random() * wishesData.length)];
-      const text = extractText(randomItem);
 
       localStorage.setItem('happy_wish_date', todayKey);
       localStorage.setItem('happy_wish_text', text);
@@ -291,18 +303,15 @@
 
     // Логіка гороскопу
     function getHoroscope(sign, btnElement) {
-      // Активна кнопка
       document.querySelectorAll('.zodiac-btn').forEach(btn => btn.classList.remove('active'));
       if (btnElement) btnElement.classList.add('active');
 
       const box = document.getElementById('horoscope-display');
 
-      // Перевірка бази гороскопів на сьогодні
       let savedHoroDate = localStorage.getItem('happy_horo_date');
       let horoDict = {};
 
       if (savedHoroDate !== todayKey) {
-        // Якщо новий день — скидаємо старі гороскопи
         localStorage.setItem('happy_horo_date', todayKey);
         localStorage.removeItem('happy_horo_dict');
       } else {
@@ -311,23 +320,19 @@
         } catch (e) { horoDict = {}; }
       }
 
-      // Якщо для цього знаку вже є згенерований текст на сьогодні — показуємо його
       if (horoDict[sign]) {
         box.innerHTML = `<b>Прогноз для знаку ${sign} на сьогодні:</b><br><br>${horoDict[sign]}`;
         return;
       }
 
-      // Якщо файл ще вантажиться
-      if (horoscopesData.length === 0) {
-        box.innerHTML = `<i>Завантаження гороскопів... Оберіть знак ще раз через секунду.</i>`;
-        return;
+      let text = "";
+      if (horoscopesData.length > 0) {
+        const randomItem = horoscopesData[Math.floor(Math.random() * horoscopesData.length)];
+        text = extractText(randomItem);
+      } else {
+        text = "Зорі шикуються у вигідну для вас комбінацію. Будь-які починання, пов'язані з особистим розвитком та фінансами, матимуть успіх!";
       }
 
-      // Генеруємо новий текст для цього знаку
-      const randomItem = horoscopesData[Math.floor(Math.random() * horoscopesData.length)];
-      const text = extractText(randomItem);
-
-      // Зберігаємо у базу для цього знаку
       horoDict[sign] = text;
       localStorage.setItem('happy_horo_dict', JSON.stringify(horoDict));
 
