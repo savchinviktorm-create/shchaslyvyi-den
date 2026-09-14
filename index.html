@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Щасливий день</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#fff8e8;--card:#fff;--text:#302b24;--muted:#7b7267;--accent:#ffb300;--accent2:#ff8a00;--line:#eee1c9}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fff4cf,#fffaf1 55%,#fff);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+.wrap{max-width:560px;margin:auto;padding:18px 16px 90px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.logo{font-size:23px;font-weight:900}.premium{background:#302b24;color:#fff;border:0;border-radius:999px;padding:9px 13px;font-weight:800}
+.hero{background:linear-gradient(135deg,#ffcf4b,#ff9f1c);border-radius:28px;padding:24px;box-shadow:0 12px 35px #f2a50033}.hero h1{margin:0 0 7px;font-size:30px}.hero p{margin:0;color:#5d4300}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;margin-top:16px;box-shadow:0 8px 25px #6d4d1110}.wish{font-size:21px;line-height:1.45;font-weight:750;min-height:150px;display:flex;align-items:center}.btn{width:100%;border:0;border-radius:17px;padding:15px 18px;font-size:17px;font-weight:850;background:#302b24;color:#fff;margin-top:12px}.btn.alt{background:#fff1c7;color:#5d4300}.btn.small{width:auto;padding:10px 13px;font-size:14px}.tabs{position:fixed;bottom:0;left:0;right:0;background:#fffdf8dd;backdrop-filter:blur(15px);border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5}.tab{border:0;background:transparent;border-radius:15px;padding:9px 13px;font-weight:800;color:var(--muted)}.tab.active{background:#fff0c2;color:#5d4300}.hidden{display:none}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.z{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 5px;text-align:center;font-weight:750}.z.selected{background:#ffe19a;border-color:#ffb300}.muted{color:var(--muted);font-size:14px}.fav{font-size:25px;background:none;border:0}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{display:inline-block;background:#fff0c2;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800}.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat div{background:#fff8e8;border-radius:16px;padding:14px}.stat b{display:block;font-size:23px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="logo">☀️ Щасливий день</div><button class="premium" onclick="buyPremium()">⭐ Преміум</button></div>
+  <section id="home">
+    <div class="hero"><h1>Доброго дня! 🌞</h1><p>Нехай сьогодні станеться щось хороше.</p></div>
+    <div class="card">
+      <div class="row"><span class="pill" id="date"></span><button class="fav" id="favBtn" onclick="toggleFav()">♡</button></div>
+      <div class="wish" id="wish">Натисни кнопку — і дізнайся своє побажання на сьогодні ✨</div>
+      <button class="btn" onclick="getWish()">✨ Отримати моє побажання</button>
+      <button class="btn alt" onclick="shareWish()">📤 Поділитися</button>
+    </div>
+  </section>
+
+  <section id="horoscope" class="hidden">
+    <div class="card"><h2>🔮 Мій гороскоп</h2><p class="muted">Обери свій знак один раз — і щодня отримуй прогноз.</p><div class="grid" id="zodiacGrid"></div></div>
+    <div class="card hidden" id="hCard"><div class="row"><h2 id="hName"></h2><span class="pill" id="hDate"></span></div>
+      <p>❤️ <b>Кохання:</b> <span id="love"></span></p><p>💼 <b>Робота:</b> <span id="work"></span></p><p>💰 <b>Фінанси:</b> <span id="money"></span></p><p>🧘 <b>Настрій:</b> <span id="mood"></span></p>
+      <p>🍀 Удача: <b id="lucky"></b>/10 &nbsp; 🔢 Число: <b id="number"></b> &nbsp; 🎨 <b id="color"></b></p>
+      <div id="premiumHint" class="muted"></div>
+    </div>
+  </section>
+
+  <section id="favorites" class="hidden"><div class="card"><h2>❤️ Обране</h2><div id="favList" class="muted">Завантаження...</div></div></section>
+  <section id="premium" class="hidden"><div class="card"><h2>⭐ Преміум</h2><p>Без реклами, розширений гороскоп та майбутні преміум-функції.</p><button class="btn" onclick="buyPremium()">⭐ Отримати Преміум</button><p class="muted">Оплата проходить через Telegram Stars.</p></div></section>
+</div>
+<nav class="tabs"><button class="tab active" onclick="showTab('home',this)">🏠 Головна</button><button class="tab" onclick="showTab('horoscope',this)">🔮 Гороскоп</button><button class="tab" onclick="showTab('favorites',this)">❤️ Обране</button><button class="tab" onclick="showTab('premium',this)">⭐ Преміум</button></nav>
+<script>
+const tg=window.Telegram?.WebApp; tg?.ready(); tg?.expand();
+const headers={'X-Telegram-Init-Data':tg?.initData||''};
+let currentWish=null;
+const signs=[['aries','♈','Овен'],['taurus','♉','Телець'],['gemini','♊','Близнюки'],['cancer','♋','Рак'],['leo','♌','Лев'],['virgo','♍','Діва'],['libra','♎','Терези'],['scorpio','♏','Скорпіон'],['sagittarius','♐','Стрілець'],['capricorn','♑','Козеріг'],['aquarius','♒','Водолій'],['pisces','♓','Риби']];
+async function api(url,opt={}){opt.headers={...(opt.headers||{}),...headers,'Content-Type':'application/json'};const r=await fetch(url,opt);const d=await r.json();if(!r.ok)throw Error(d.error||'Помилка');return d}
+function showTab(id,btn){document.querySelectorAll('section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn?.classList.add('active');if(id==='favorites')loadFav();if(id==='horoscope')loadHoroscope()}
+async function getWish(){try{const d=await api('/api/wish',{method:'POST',body:'{}'});currentWish=d;document.getElementById('wish').textContent=d.text;document.getElementById('date').textContent=d.date;document.getElementById('favBtn').textContent=d.favorite?'♥':'♡'}catch(e){document.getElementById('wish').textContent=e.message}}
+async function toggleFav(){if(!currentWish)return;const d=await api('/api/favorite',{method:'POST',body:JSON.stringify({wish_id:currentWish.id})});document.getElementById('favBtn').textContent=d.favorite?'♥':'♡'}
+async function shareWish(){if(!currentWish)return alert('Спочатку отримай побажання');const text=encodeURIComponent('✨ Моє побажання на сьогодні:\\n\\n'+currentWish.text);if(tg?.openTelegramLink)tg.openTelegramLink('https://t.me/share/url?url=&text='+text);else navigator.clipboard?.writeText(currentWish.text)}
+function renderSigns(selected){document.getElementById('zodiacGrid').innerHTML=signs.map(s=>`<button class="z ${selected===s[0]?'selected':''}" onclick="setZodiac('${s[0]}')">${s[1]} ${s[2]}</button>`).join('')}
+async function loadHoroscope(){try{const d=await api('/api/horoscope');renderSigns(d.zodiac);if(d.zodiac)fillHoroscope(d)}catch(e){}}
+async function setZodiac(z){await api('/api/zodiac',{method:'POST',body:JSON.stringify({zodiac:z})});loadHoroscope()}
+function fillHoroscope(d){document.getElementById('hCard').classList.remove('hidden');document.getElementById('hName').textContent='🔮 '+d.name;document.getElementById('hDate').textContent=new Date().toLocaleDateString('uk-UA');['love','work','money','mood','lucky','number','color'].forEach(k=>document.getElementById(k).textContent=d[k]);document.getElementById('premiumHint').textContent=d.premium?'⭐ Преміум активний':'Безкоштовна версія. Преміум відкриває додаткові можливості.'}
+async function loadFav(){try{const a=await api('/api/favorites');document.getElementById('favList').innerHTML=a.length?a.map(x=>`<div class="card" style="margin-top:10px"><div>${x.text}</div></div>`).join(''):'Тут поки порожньо. Натисни ♡ біля побажання.'}catch(e){document.getElementById('favList').textContent=e.message}}
+async function buyPremium(){try{const d=await api('/api/premium/invoice',{method:'POST',body:'{}'});if(tg?.openInvoice)tg.openInvoice(d.url,()=>{});else location.href=d.url}catch(e){alert(e.message)}}
+(async()=>{try{const d=await api('/api/me');document.getElementById('date').textContent=d.date;getWish()}catch(e){document.getElementById('wish').textContent='Відкрий застосунок через Telegram-бота.'}})();
+</script>
+</body>
+</html>
