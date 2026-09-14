@@ -33,9 +33,16 @@
       margin-bottom: 20px;
     }
 
+    .user-greeting {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
     .header-date {
       color: var(--accent-gold);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -57,7 +64,7 @@
     }
 
     .prediction-box {
-      font-size: 17px;
+      font-size: 16px;
       line-height: 1.6;
       color: var(--text-main);
       margin: 20px 0;
@@ -65,10 +72,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 14px;
       background: rgba(255, 255, 255, 0.03);
       border-radius: 12px;
       width: 100%;
+      text-align: center;
     }
 
     .btn-main {
@@ -77,7 +85,7 @@
       border: none;
       padding: 16px 28px;
       border-radius: 30px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
@@ -87,6 +95,13 @@
     }
 
     .btn-main:active { transform: scale(0.96); }
+    .btn-main:disabled {
+      background: #2a2e39;
+      color: var(--text-sub);
+      box-shadow: none;
+      cursor: not-allowed;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
     .zodiac-grid {
       display: grid;
@@ -108,11 +123,13 @@
       flex-direction: column;
       align-items: center;
       gap: 4px;
+      transition: all 0.2s ease;
     }
 
     .zodiac-btn.active {
       border-color: var(--accent-gold);
-      background: rgba(212, 175, 55, 0.15);
+      background: rgba(212, 175, 55, 0.25);
+      font-weight: bold;
     }
 
     .nav-bar {
@@ -144,6 +161,7 @@
 <body>
 
   <div class="header">
+    <div id="user-greeting" class="user-greeting">Вітаю! ✨</div>
     <div id="current-date" class="header-date"></div>
   </div>
 
@@ -153,28 +171,28 @@
     <div id="wish-display" class="prediction-box">
       Розгорни своє печиво з передбаченням і дізнайся, яка магія чекає на тебе сьогодні!
     </div>
-    <button class="btn-main" onclick="getWish()">🥠 Розкрити передбачення</button>
+    <button id="btn-wish" class="btn-main" onclick="getWish()">🥠 Розкрити передбачення</button>
   </div>
 
   <!-- Вкладка Гороскоп -->
   <div id="tab-horoscope" class="card hidden">
     <div style="font-size: 30px;">🔮</div>
     <div id="horoscope-display" class="prediction-box">
-      Обери свій знак зодіаку нижче, щоб отримати детальний астрологічний прогноз.
+      Обери свій знак зодіаку нижче, щоб отримати астрологічний прогноз на сьогодні.
     </div>
     <div class="zodiac-grid">
-      <button class="zodiac-btn" onclick="getHoroscope('Овен')">♈ Овен</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Телець')">♉ Телець</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Близнюки')">♊ Близнюки</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Рак')">♋ Рак</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Лев')">♌ Лев</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Діва')">♍ Діва</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Терези')">♎ Терези</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Скорпіон')">♏ Скорпіон</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Стрілець')">♐ Стрілець</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Козоріг')">♑ Козоріг</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Водолій')">♒ Водолій</button>
-      <button class="zodiac-btn" onclick="getHoroscope('Риби')">♓ Риби</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Овен', this)">♈ Овен</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Телець', this)">♉ Телець</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Близнюки', this)">♊ Близнюки</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Рак', this)">♋ Рак</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Лев', this)">♌ Лев</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Діва', this)">♍ Діва</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Терези', this)">♎ Терези</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Скорпіон', this)">♏ Скорпіон</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Стрілець', this)">♐ Стрілець</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Козоріг', this)">♑ Козоріг</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Водолій', this)">♒ Водолій</button>
+      <button class="zodiac-btn" onclick="getHoroscope('Риби', this)">♓ Риби</button>
     </div>
   </div>
 
@@ -184,50 +202,136 @@
   </div>
 
   <script>
+    // Ініціалізація Telegram WebApp та персоналізація
+    let userName = "Друже";
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
+      const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (tgUser && tgUser.first_name) {
+        userName = tgUser.first_name;
+      }
     }
+    document.getElementById('user-greeting').innerText = `Вітаю, ${userName}! ✨`;
 
-    // Поточна дата
+    // Форматування поточної дати
     const now = new Date();
     const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
-    const dateFormatted = now.toLocaleDateString('uk-UA', options);
-    document.getElementById('current-date').innerText = `Сьогодні, ${dateFormatted}`;
+    document.getElementById('current-date').innerText = `Сьогодні, ${now.toLocaleDateString('uk-UA', options)}`;
+
+    // Ключ сьогоднішньої дати YYYY-MM-DD для localStorage
+    const todayKey = now.toISOString().split('T')[0];
 
     let wishesData = [];
     let horoscopesData = [];
 
-    // Читання файлу передбачень
+    // Допоміжна функція витягування тексту із масиву (якщо масив рядків або об'єктів)
+    function extractText(item) {
+      if (!item) return '';
+      if (typeof item === 'string') return item;
+      return item.text || item.prediction || item.phrase || JSON.stringify(item);
+    }
+
+    // Завантаження файлів
     fetch('./data/wishes.json')
       .then(r => r.json())
-      .then(data => { wishesData = data; })
-      .catch(e => console.log('Не вдалося завантажити wishes.json'));
+      .then(data => { wishesData = data; checkSavedWish(); })
+      .catch(e => console.log('Не вдалося завантажити wishes.json', e));
 
-    // Читання файлу гороскопів
     fetch('./data/horoscopes.json')
       .then(r => r.json())
       .then(data => { horoscopesData = data; })
-      .catch(e => console.log('Не вдалося завантажити horoscopes.json'));
+      .catch(e => console.log('Не вдалося завантажити horoscopes.json', e));
 
-    function getWish() {
-      const box = document.getElementById('wish-display');
-      if (wishesData.length > 0) {
-        const item = wishesData[Math.floor(Math.random() * wishesData.length)];
-        box.innerHTML = `<b>Сьогодні, ${now.toLocaleDateString('uk-UA', {day:'numeric', month:'long'})}:</b><br><br>✨ "${item}"`;
-      } else {
-        box.innerHTML = `<b>Сьогодні, ${now.toLocaleDateString('uk-UA', {day:'numeric', month:'long'})}:</b><br><br>✨ Всесвіт готує для тебе щось неймовірно солодке та незабутнє. Важливий дзвінок або зустріч уже на підході!`;
+    // Перевірка, чи вже було отримано передбачення сьогодні
+    function checkSavedWish() {
+      const savedDate = localStorage.getItem('happy_wish_date');
+      const savedText = localStorage.getItem('happy_wish_text');
+
+      if (savedDate === todayKey && savedText) {
+        displayWishText(savedText, true);
       }
     }
 
-    function getHoroscope(sign) {
-      const box = document.getElementById('horoscope-display');
-      if (horoscopesData.length > 0) {
-        const item = horoscopesData[Math.floor(Math.random() * horoscopesData.length)];
-        box.innerHTML = `<b>Прогноз для знаку ${sign} на сьогодні:</b><br><br>${item}`;
-      } else {
-        box.innerHTML = `<b>Прогноз для знаку ${sign} на сьогодні:</b><br><br>Зорі шикуються у вигідну для вас комбінацію. Будь-які починання, пов'язані з особистим розвитком та фінансами, матимуть успіх. Не бійтеся брати відповідальність — ви сильніші, ніж здається!`;
+    function getWish() {
+      const savedDate = localStorage.getItem('happy_wish_date');
+      const savedText = localStorage.getItem('happy_wish_text');
+
+      if (savedDate === todayKey && savedText) {
+        displayWishText(savedText, true);
+        return;
       }
+
+      if (wishesData.length === 0) {
+        document.getElementById('wish-display').innerHTML = `<i>Завантаження передбачень... Зачекайте пару секунд.</i>`;
+        return;
+      }
+
+      const randomItem = wishesData[Math.floor(Math.random() * wishesData.length)];
+      const text = extractText(randomItem);
+
+      localStorage.setItem('happy_wish_date', todayKey);
+      localStorage.setItem('happy_wish_text', text);
+
+      displayWishText(text, true);
+    }
+
+    function displayWishText(text, isDone) {
+      const box = document.getElementById('wish-display');
+      const btn = document.getElementById('btn-wish');
+      const formattedDay = now.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
+
+      box.innerHTML = `<div><b>Передбачення для ${userName} на ${formattedDay}:</b><br><br>✨ "${text}"</div>`;
+
+      if (isDone && btn) {
+        btn.disabled = true;
+        btn.innerText = "✨ Передбачення на сьогодні отримано";
+      }
+    }
+
+    // Логіка гороскопу
+    function getHoroscope(sign, btnElement) {
+      // Активна кнопка
+      document.querySelectorAll('.zodiac-btn').forEach(btn => btn.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+
+      const box = document.getElementById('horoscope-display');
+
+      // Перевірка бази гороскопів на сьогодні
+      let savedHoroDate = localStorage.getItem('happy_horo_date');
+      let horoDict = {};
+
+      if (savedHoroDate !== todayKey) {
+        // Якщо новий день — скидаємо старі гороскопи
+        localStorage.setItem('happy_horo_date', todayKey);
+        localStorage.removeItem('happy_horo_dict');
+      } else {
+        try {
+          horoDict = JSON.parse(localStorage.getItem('happy_horo_dict')) || {};
+        } catch (e) { horoDict = {}; }
+      }
+
+      // Якщо для цього знаку вже є згенерований текст на сьогодні — показуємо його
+      if (horoDict[sign]) {
+        box.innerHTML = `<b>Прогноз для знаку ${sign} на сьогодні:</b><br><br>${horoDict[sign]}`;
+        return;
+      }
+
+      // Якщо файл ще вантажиться
+      if (horoscopesData.length === 0) {
+        box.innerHTML = `<i>Завантаження гороскопів... Оберіть знак ще раз через секунду.</i>`;
+        return;
+      }
+
+      // Генеруємо новий текст для цього знаку
+      const randomItem = horoscopesData[Math.floor(Math.random() * horoscopesData.length)];
+      const text = extractText(randomItem);
+
+      // Зберігаємо у базу для цього знаку
+      horoDict[sign] = text;
+      localStorage.setItem('happy_horo_dict', JSON.stringify(horoDict));
+
+      box.innerHTML = `<b>Прогноз для знаку ${sign} на сьогодні:</b><br><br>${text}`;
     }
 
     function switchTab(tab) {
