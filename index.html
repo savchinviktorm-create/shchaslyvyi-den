@@ -219,17 +219,29 @@
     const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
     document.getElementById('current-date').innerText = `Сьогодні, ${now.toLocaleDateString('uk-UA', options)}`;
 
-    // Ключ сьогоднішньої дати YYYY-MM-DD для localStorage
-    const todayKey = now.toISOString().split('T')[0];
+    // Ключ сьогоднішньої локальної дати YYYY-MM-DD для localStorage
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayKey = `${year}-${month}-${day}`;
 
     let wishesData = [];
     let horoscopesData = [];
 
-    // Допоміжна функція витягування тексту із масиву (якщо масив рядків або об'єктів)
+    // Допоміжна функція витягування тексту із масиву
     function extractText(item) {
       if (!item) return '';
       if (typeof item === 'string') return item;
       return item.text || item.prediction || item.phrase || item.horoscope || JSON.stringify(item);
+    }
+
+    // Генерація числового хешу для прив'язки знаку та дати до унікального індексу
+    function getHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash * 31 + str.charCodeAt(i)) % 1000000007;
+      }
+      return Math.abs(hash);
     }
 
     // Завантаження файлу передбачень
@@ -308,6 +320,7 @@
 
       const box = document.getElementById('horoscope-display');
 
+      // Перевірка та очищення застарілого денного кешу
       let savedHoroDate = localStorage.getItem('happy_horo_date');
       let horoDict = {};
 
@@ -320,19 +333,25 @@
         } catch (e) { horoDict = {}; }
       }
 
+      // Якщо знак вже відкривали сьогодні, показуємо збережений текст
       if (horoDict[sign]) {
         box.innerHTML = `<b>Прогноз для знаку ${sign} на сьогодні:</b><br><br>${horoDict[sign]}`;
         return;
       }
 
-      let text = "";
-      if (horoscopesData.length > 0) {
-        const randomItem = horoscopesData[Math.floor(Math.random() * horoscopesData.length)];
-        text = extractText(randomItem);
-      } else {
-        text = "Зорі шикуються у вигідну для вас комбінацію. Будь-які починання, пов'язані з особистим розвитком та фінансами, матимуть успіх!";
+      // Якщо файл гороскопів ще завантажується
+      if (!horoscopesData || horoscopesData.length === 0) {
+        box.innerHTML = `<i>Отримуємо астрологічні дані для знаку ${sign}...</i>`;
+        setTimeout(() => getHoroscope(sign, btnElement), 250);
+        return;
       }
 
+      // Обчислюємо унікальний індекс фразу для конкретного знаку та дати
+      const hashVal = getHash(`${todayKey}_${sign}`);
+      const index = hashVal % horoscopesData.length;
+      const text = extractText(horoscopesData[index]);
+
+      // Кешуємо у словник
       horoDict[sign] = text;
       localStorage.setItem('happy_horo_dict', JSON.stringify(horoDict));
 
